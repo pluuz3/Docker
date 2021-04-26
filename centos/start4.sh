@@ -1,23 +1,19 @@
 #!/bin/sh
-# Usage: ./start build|start|run|stop|clean
-# Author: Andrew L
-
-ContName="ubuntu20_sshd"
-ContIP="0.0.0.0"
-HostPort=2200
-OSType="Ubuntu20.4:aarch64"
-Packages="Open-SSH-Server"
-DescTest="Tested on Mac M1"
-Login=$(grep -i chpass Dockerfile | awk '{print $3}')
+# Usage ./start build|run|start|stop|clean
+# For Mac M1, testing ARM container : Install https://docs.docker.com/docker-for-mac/apple-silicon/
+# set -x
 DocFile="Dockerfile"
-SSHinfo="ssh -p 2201-4 ubuntu@0.0.0.0"
+OSType="CentOS 8 aarch64"
+Packages="Open-SSH-Server"
+Login="centos:xxxxx"
+ImageTag="centos8_sshd"
 
-Build() {   echo "Building\n";  docker build --tag ${ContName} . ;  }
-Start() {   echo "Starting\n";  for i in {1..4}; do docker start ${ContName}${i} ; done ; }
-Run()   {   echo "Runing\n";    Build ; sleep 3 ; Start4Cs; }
-Stop()  {   echo "Stoping\n" ;  if [[ -n $(docker ps -a -q) ]] ; then  docker stop $(docker ps -a -q) ; fi ; }
+Build() {   echo "Building\n"; docker build  --target $ImageTag  --tag $ImageTag . ; }
+Run()   {   echo "Runing\n";    }
+Start() {   echo "Starting\n" ; Start4Cs;  }
+Stop()  {   echo "Stoping\n" ;  if [[ -n $(docker ps -a -q) ]] ; then  docker stop $(docker ps -a | grep -i $ImageTag | awk '{print $1}') ; fi ; }
 Clean() {   echo "Clean\n";     docker rm $(docker ps -a -f status=exited -q) ; }
-Start4Cs(){ for i in {1..4}; do docker run -dit --rm --name ${ContName}${i} -p 220${i}:22 ${ContName} ; done ;  }
+Start4Cs(){ for i in {1..4}; do docker run -dit --rm --name CentOS_SSHD${i} -p 221${i}:22 $ImageTag ; done ;  }
 OpenCS(){   open 'https://devhints.io/bash#conditionals' ; }
 ReadFile(){ while read LINE ; do echo $LINE ; done < ${DocFile} ; }
 ContainerInfo(){
@@ -26,9 +22,8 @@ ContainerInfo(){
   Launched 4 Containers: \n$(docker ps) \n
   OS Type   : ${OSType}
   Packages  : ${Packages}
-  Desc Test : ${DescTest}
   Login Info: ${Login}
-  To SSH use: ${SSHinfo} \n" ; 
+  To SSH use: ssh -p 2211-4 centos@0.0.0.0 \n" ; 
 }
 ReadWholeFile(){ Lines=$(<Dockerfile) ; echo "\n${Lines}\n" ; }
 LogLocation(){
@@ -40,13 +35,11 @@ LogLocation(){
   MacOS: ~/Library/Containers/com.docker.docker/Data/vms/0/
   "
 }
-URLs(){ echo "\nImage Build: https://www.edureka.co/community/71282/how-to-enable-ssh-inside-docker-container \n" ; }
-
 #Main ======================
 case "$1" in
   build )   Build ;;
   run )     Run ;;
-  start)    Start4Cs ; ContainerInfo ;;
+  start)    Build ; Start4Cs ; ContainerInfo ;;
   stop )    Stop ;;
   clean)    Clean ;;
   info)     clear ; ContainerInfo ;;
