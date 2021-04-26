@@ -6,3 +6,13 @@ cd ..
 git add .
 git commit -m 'messy'
 git push origin
+
+==========================================
+For Ubuntu SSH Server :
+  1) To run ubuntu containert clone :
+      git clone https://github.com/pluuz3/Docker/ubuntu
+  2) Examine: Dockerfile and start4.sh. Will run 4 containers ubuntu20-sshd
+      cd ubuntu ; chmod u+x start4.sh ; ./start4.sh
+
+==========================================
+For CentOS will be same above but change centos dir
