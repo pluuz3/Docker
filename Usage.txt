@@ -1,0 +1,8 @@
+# clone then update and push to remote
+git clone https://github.com/pluuz3/Docker.git
+mkdir ubuntu
+cd ubuntu ; touch Dockerfile ; touch start4.sh
+cd ..
+git add .
+git commit -m 'messy'
+git push origin
